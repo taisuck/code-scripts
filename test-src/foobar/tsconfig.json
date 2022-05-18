@@ -8,7 +8,7 @@
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"rootDir": ".",
-		"strict": true,   /* enable all strict type-checking options */
+		"strict": true,
 		"outDir": "../../test-dist/foobar",
 	}
 }
