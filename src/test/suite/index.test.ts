@@ -6,37 +6,29 @@ suite('Process Test Suite',  async () => {
         try {
             const response = await execSync( 'node ./dist/index.js' );
         } catch( e: unknown ) {
-            if (typeof e === "string") {
-                e.toUpperCase() // works, `e` narrowed to string
-            } else if (e instanceof Error) {
-                console.log( process.cwd() );
-                console.error( e.message );
-                console.error("AAAAAA");
-            }
+            assert.ifError( e );
         }
     });
 
 
-    // test( 'compile 옵션 테스트', () => {
-    //     exec( 'node ./dist/index.js --compile', (err, stdout, stderr) => {
-    //         assert.ifError( err );
+    await test( 'compile 옵션 테스트', async() => {
+        try {
+            await execSync( 'node ../../dist/index.js --compile', {
+                cwd: 'D:\\workspace\\opensource\\code-scripts\\test-src\\foobar'
+            } );
+        } catch( e: unknown ) {
+            assert.ifError( e );
+        }
+        
+    } );
 
-    //         console.log( stdout );
-    //     } )
-    // } );
-
-    //**
+    
     await test( 'compile target 옵션 테스트', async () => {
         try {
             await execSync( 'node ./dist/index.js --compile --target=./test-src/compile' );
         } catch( e: unknown ) {
-            if (typeof e === "string") {
-                e.toUpperCase() // works, `e` narrowed to string
-            } else if (e instanceof Error) {
-                console.error( e.message );
-            }
+            assert.ifError( e );
         }
     } );
-    //** */
 
 });
