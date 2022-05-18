@@ -22,10 +22,17 @@ suite('Process Test Suite',  async () => {
         
     } );
 
-    
     await test( 'compile target 옵션 테스트', async () => {
         try {
             await execSync( 'node ./dist/index.js --compile --target=./test-src/compile' );
+        } catch( e: unknown ) {
+            assert.ifError( e );
+        }
+    } );
+    
+    await test( 'compile target js_output_file 옵션 테스트', async () => {
+        try {
+            await execSync( 'node ./dist/index.js --compile --target=./test-src/compile --js_output_file=out.min.js' );
         } catch( e: unknown ) {
             assert.ifError( e );
         }

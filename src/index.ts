@@ -1,7 +1,8 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 import { ChildProcess, exec, execSync, spawn, spawnSync } from 'child_process';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'fs';
+import { parse } from 'comment-json';
 
 if( 2 === process.argv.length ) {
     console.log( 'usage : [option] ' );
@@ -9,6 +10,7 @@ if( 2 === process.argv.length ) {
 }
 
 const CURRENT_DIR = process.cwd();
+const OUTPUT_TMP_JS_FILE = 'out.tmp.js';
 // console.log( CURRENT_DIR );
 const IS_COMPILE = process.argv.includes( '--compile' );
 
@@ -39,12 +41,51 @@ if( !existsSync( TYPESCRIPT_CONFIG_JSON ) ) {
 if( IS_COMPILE ) {
     try {
         execSync( `yarn tsc -p ${COMPILE_DIR}` );
-        process.exit( 0 );
     } catch( e ) {
         console.error( 'raised exception' );
         process.exit( 1001 );
     }
-} else {
-    console.log( process.argv );
 }
 
+function readPackageFiles( directory: string, excludeFiles: string|Array<string> ) : Array<string>
+{
+    let packageFiles : Array<string> = [];
+
+    readdirSync( directory ).forEach( (fileName) => {
+        if( fileName.endsWith('.js') 
+            && ( ( typeof excludeFiles === 'string' && fileName !== excludeFiles )
+             || !excludeFiles.includes( fileName ) ) ) {
+            packageFiles.push( path.join( directory, fileName ) );
+        }
+    } );
+
+    return packageFiles;
+}
+
+const HAS_JS_OUT_FILE = process.argv.includes( '--js_output_file' );
+
+let JS_OUT_FILE;
+const js_option = _.findIndex( process.argv, ( elem: string ) => {
+    if( elem.startsWith('--js_output_file') ) {
+        return true;
+    }
+    return false;
+} );
+
+if( -1 !== js_option ) {
+    const FILE_NAME = process.argv[ js_option ].replace('--js_output_file=', '');
+    const tsconfig : any = parse( readFileSync( TYPESCRIPT_CONFIG_JSON ).toString() );
+    const { outDir } = tsconfig['compilerOptions'];
+    const OUTPUT_DIR = path.resolve( COMPILE_DIR, outDir );
+
+    let jsFileContents = '';
+    const packageJsFiles = readPackageFiles( OUTPUT_DIR, [ OUTPUT_TMP_JS_FILE, FILE_NAME ] );
+    packageJsFiles.forEach((fileName) => {
+        jsFileContents += readFileSync(fileName).toString().replace('"use strict";\r\n', '') + '\r\n';
+        unlinkSync(fileName);
+    });
+
+    writeFileSync(path.join( OUTPUT_DIR, OUTPUT_TMP_JS_FILE), '"use strict";\r\n(function(document, window){\r\n' + jsFileContents + '})(document, window);\r\n');
+    execSync( `yarn uglifyjs ${path.join(OUTPUT_DIR, OUTPUT_TMP_JS_FILE)}  --output ${path.join( OUTPUT_DIR, FILE_NAME )}` )
+    unlinkSync( path.join( OUTPUT_DIR, OUTPUT_TMP_JS_FILE ) );
+}

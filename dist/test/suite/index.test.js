@@ -29,5 +29,13 @@ suite('Process Test Suite', async () => {
             assert.ifError(e);
         }
     });
+    await test('compile target js_output_file 옵션 테스트', async () => {
+        try {
+            await (0, child_process_1.execSync)('node ./dist/index.js --compile --target=./test-src/compile --js_output_file=out.min.js');
+        }
+        catch (e) {
+            assert.ifError(e);
+        }
+    });
 });
 //# sourceMappingURL=index.test.js.map
