@@ -5,7 +5,7 @@ const child_process_1 = require("child_process");
 suite('Process Test Suite', async () => {
     await test('호출 테스트', async () => {
         try {
-            const response = await (0, child_process_1.execSync)('node ./dist/index.js');
+            const response = await (0, child_process_1.execSync)('node ./bin/code-scripts.js');
         }
         catch (e) {
             assert.ifError(e);
@@ -13,7 +13,7 @@ suite('Process Test Suite', async () => {
     });
     await test('compile 옵션 테스트', async () => {
         try {
-            await (0, child_process_1.execSync)('node ../../dist/index.js --compile', {
+            await (0, child_process_1.execSync)('node ../../bin/code-scripts.js build', {
                 cwd: 'D:\\workspace\\opensource\\code-scripts\\test-src\\foobar'
             });
         }
@@ -23,7 +23,7 @@ suite('Process Test Suite', async () => {
     });
     await test('compile target 옵션 테스트', async () => {
         try {
-            await (0, child_process_1.execSync)('node ./dist/index.js --compile --target=./test-src/compile');
+            await (0, child_process_1.execSync)('node ./bin/code-scripts.js build --target=./test-src/compile');
         }
         catch (e) {
             assert.ifError(e);
@@ -31,7 +31,7 @@ suite('Process Test Suite', async () => {
     });
     await test('compile target js_output_file 옵션 테스트', async () => {
         try {
-            await (0, child_process_1.execSync)('node ./dist/index.js --compile --target=./test-src/compile --js_output_file=out.min.js');
+            await (0, child_process_1.execSync)('node ./bin/code-scripts.js build --target=./test-src/compile --package=out.min.js');
         }
         catch (e) {
             assert.ifError(e);

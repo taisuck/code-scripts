@@ -2,9 +2,25 @@
   "name": "code-scripts",
   "version": "0.0.1",
   "description": "vscode extention build scripts",
-  "main": "./dist/index.js",
   "author": "taisuck",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taisuck/code-scripts.git"
+  },
+  "bin": {
+    "code-scripts": "./bin/code-scripts.js"
+  },
+  "engines": {
+    "node": ">=12.0.0",
+    "yarn": "^1.6.0"
+  },
+  "keywords": [
+    "typescript",
+    "vscode",
+    "extension",
+    "scripts"
+  ],
   "scripts": {
     "compile": "tsc -p ./src",
     "run": "yarn run compile && node ./dist/index.js",

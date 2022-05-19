@@ -4,16 +4,16 @@ import { exec, execSync } from 'child_process';
 suite('Process Test Suite',  async () => {
     await test( '호출 테스트', async () => {
         try {
-            const response = await execSync( 'node ./dist/index.js' );
+            const response = await execSync( 'node ./bin/code-scripts.js' );
         } catch( e: unknown ) {
             assert.ifError( e );
         }
     });
 
 
-    await test( 'compile 옵션 테스트', async() => {
+    await test( 'build 옵션 테스트', async() => {
         try {
-            await execSync( 'node ../../dist/index.js --compile', {
+            await execSync( 'node ../../bin/code-scripts.js build', {
                 cwd: 'D:\\workspace\\opensource\\code-scripts\\test-src\\foobar'
             } );
         } catch( e: unknown ) {
@@ -22,17 +22,17 @@ suite('Process Test Suite',  async () => {
         
     } );
 
-    await test( 'compile target 옵션 테스트', async () => {
+    await test( 'build target 옵션 테스트', async () => {
         try {
-            await execSync( 'node ./dist/index.js --compile --target=./test-src/compile' );
+            await execSync( 'node ./bin/code-scripts.js build --target=./test-src/compile' );
         } catch( e: unknown ) {
             assert.ifError( e );
         }
     } );
     
-    await test( 'compile target js_output_file 옵션 테스트', async () => {
+    await test( 'build target package 옵션 테스트', async () => {
         try {
-            await execSync( 'node ./dist/index.js --compile --target=./test-src/compile --js_output_file=out.min.js' );
+            await execSync( 'node ./bin/code-scripts.js build --target=./test-src/compile --package=out.min.js' );
         } catch( e: unknown ) {
             assert.ifError( e );
         }
