@@ -1,51 +1,14 @@
 import * as path from 'path';
 import * as _ from 'lodash';
-import { ChildProcess, exec, execSync, spawn, spawnSync } from 'child_process';
+
+import { execSync } from 'child_process';
 import { existsSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'fs';
 import { parse } from 'comment-json';
 
-if( 2 === process.argv.length ) {
-    console.log( 'usage : [option] ' );
-    process.exit( 0 );
-}
-
-const CURRENT_DIR = process.cwd();
+const OPTION_PACKAGE = 'package';
+const OPTION_TARGET = 'target';
 const OUTPUT_TMP_JS_FILE = 'out.tmp.js';
-// console.log( CURRENT_DIR );
-const IS_COMPILE = process.argv.includes( '--compile' );
-
-let TARGET_DIR;
-const index = _.findIndex( process.argv, ( elem: string ) => {
-    if( elem.startsWith('--target') ) {
-        return true;
-    }
-    return false;
-} );
-
-if( -1 !== index ) {
-    const OPTION = process.argv[ index ].replace('--target=', '');
-    // TARGET_DIR = path.resolve( CURRENT_DIR, OPTION );
-    TARGET_DIR = OPTION;
-} else {
-    TARGET_DIR = CURRENT_DIR;
-}
-
-const COMPILE_DIR = TARGET_DIR;
-
-const TYPESCRIPT_CONFIG_JSON = path.resolve( COMPILE_DIR, "tsconfig.json" );
-if( !existsSync( TYPESCRIPT_CONFIG_JSON ) ) {
-    console.error(`Not exists file('tsconfig.json').`);
-    process.exit( -1 );
-}
-
-if( IS_COMPILE ) {
-    try {
-        execSync( `yarn tsc -p ${COMPILE_DIR}` );
-    } catch( e ) {
-        console.error( 'raised exception' );
-        process.exit( 1001 );
-    }
-}
+const CURRENT_DIR = process.cwd();
 
 function readPackageFiles( directory: string, excludeFiles: string|Array<string> ) : Array<string>
 {
@@ -62,21 +25,45 @@ function readPackageFiles( directory: string, excludeFiles: string|Array<string>
     return packageFiles;
 }
 
-const HAS_JS_OUT_FILE = process.argv.includes( '--js_output_file' );
-
-let JS_OUT_FILE;
-const js_option = _.findIndex( process.argv, ( elem: string ) => {
-    if( elem.startsWith('--js_output_file') ) {
+const target_option_index = _.findIndex( process.argv, ( elem: string ) => {
+    if( elem.startsWith(`--${OPTION_TARGET}`) ) {
         return true;
     }
     return false;
 } );
 
-if( -1 !== js_option ) {
-    const FILE_NAME = process.argv[ js_option ].replace('--js_output_file=', '');
+let TARGET_DIR = CURRENT_DIR;
+if( -1 !== target_option_index ) {
+    TARGET_DIR = process.argv[ target_option_index ].replace(`--${OPTION_TARGET}=`, '');
+}
+const WORKING_DIR = TARGET_DIR;
+
+
+const TYPESCRIPT_CONFIG_JSON = path.resolve( WORKING_DIR, "tsconfig.json" );
+if( !existsSync( TYPESCRIPT_CONFIG_JSON ) ) {
+    console.error(`Not exists file('tsconfig.json').`);
+    process.exit( -1 );
+}
+
+try {
+    execSync( `yarn tsc -p ${WORKING_DIR}` );
+} catch( e ) {
+    console.error( 'raised exception' );
+    process.exit( 1001 );
+}
+
+const package_option_index = _.findIndex( process.argv, ( elem: string ) => {
+    if( elem.startsWith( `--${OPTION_PACKAGE}` ) ) {
+        return true;
+    }
+    return false;
+} );
+
+if( -1 !== package_option_index ) {
+    const FILE_NAME = process.argv[ package_option_index ].replace(`--${OPTION_PACKAGE}=`, '');
     const tsconfig : any = parse( readFileSync( TYPESCRIPT_CONFIG_JSON ).toString() );
     const { outDir } = tsconfig['compilerOptions'];
-    const OUTPUT_DIR = path.resolve( COMPILE_DIR, outDir );
+    const OUTPUT_DIR = path.resolve( WORKING_DIR, outDir );
 
     let jsFileContents = '';
     const packageJsFiles = readPackageFiles( OUTPUT_DIR, [ OUTPUT_TMP_JS_FILE, FILE_NAME ] );
@@ -89,3 +76,4 @@ if( -1 !== js_option ) {
     execSync( `yarn uglifyjs ${path.join(OUTPUT_DIR, OUTPUT_TMP_JS_FILE)}  --output ${path.join( OUTPUT_DIR, FILE_NAME )}` )
     unlinkSync( path.join( OUTPUT_DIR, OUTPUT_TMP_JS_FILE ) );
 }
+
