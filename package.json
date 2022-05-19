@@ -2,7 +2,10 @@
   "name": "code-scripts",
   "version": "0.0.5",
   "description": "vscode extention build scripts",
-  "author": "taisuck",
+  "author": {
+    "name": "taisuck",
+    "email": "taisuck@gmail.com"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
