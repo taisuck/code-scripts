@@ -1,6 +1,6 @@
 {
   "name": "code-scripts",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "vscode extention build scripts",
   "author": {
     "name": "taisuck",
@@ -25,7 +25,8 @@
     "scripts"
   ],
   "files": [
-    "dist"
+    "dist",
+    "!dist/test"
   ],
   "scripts": {
     "compile": "tsc -p ./src",
