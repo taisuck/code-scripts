@@ -1,6 +1,6 @@
 {
   "name": "code-scripts",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "vscode extention build scripts",
   "author": "taisuck",
   "license": "MIT",
@@ -20,6 +20,10 @@
     "vscode",
     "extension",
     "scripts"
+  ],
+  "files": [
+    "dist",
+    "!dist/test"
   ],
   "scripts": {
     "compile": "tsc -p ./src",
